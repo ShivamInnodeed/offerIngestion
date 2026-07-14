@@ -1,0 +1,68 @@
+2026-07-08 10:21:34,675 INFO __main__ Logging to /app/data/logs/offer_ingestion_20260708.log
+2026-07-08 10:21:34,740 INFO __main__ Offline index mode: loaded 116 offer(s) from /app/data/output/updated_offers.json (skip fetch/XML/LLM/change detection)
+2026-07-08 10:21:34,776 INFO sentence_transformers.base.model No device provided, using cpu
+2026-07-08 10:21:34,778 INFO sentence_transformers.base.model Loading SentenceTransformer model from /app/models/all-MiniLM-L6-v2.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:  84%|████████▍ | 87/103 [00:00<00:00, 841.46it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 933.44it/s]
+2026-07-08 10:21:35,106 INFO __main__ Encoding offer batch 1 (32 records)
+2026-07-08 10:21:37,220 INFO __main__ Encoding offer batch 2 (32 records)
+2026-07-08 10:21:38,767 INFO __main__ Encoding offer batch 3 (32 records)
+2026-07-08 10:21:40,337 INFO __main__ Encoding offer batch 4 (20 records)
+2026-07-08 10:21:40,650 INFO __main__ Embedding stage complete in 5.91s (116 offers → 116 ES docs)
+2026-07-08 10:21:40,653 INFO __main__ Initial run — no stale docs to remove
+2026-07-08 10:21:40,665 INFO elastic_transport.transport HEAD http://elasticsearch:9200/kb_documents_offers [status:404 duration:0.004s]
+2026-07-08 10:21:40,667 INFO elastic_transport.transport HEAD http://elasticsearch:9200/kb_documents_offers [status:404 duration:0.001s]
+2026-07-08 10:21:40,887 INFO elastic_transport.transport PUT http://elasticsearch:9200/kb_documents_offers [status:200 duration:0.219s]
+2026-07-08 10:21:41,771 INFO elastic_transport.transport PUT http://elasticsearch:9200/_bulk?refresh=false [status:200 duration:0.571s]
+2026-07-08 10:21:42,155 INFO elastic_transport.transport POST http://elasticsearch:9200/kb_documents_offers/_refresh [status:200 duration:0.382s]
+2026-07-08 10:21:42,156 INFO __main__ ES index complete in 1.50s (indexed=116 errors=0 index=kb_documents_offers)
+2026-07-08 10:21:42,159 WARNING __main__ finalize skipped: no run_id
+2026-07-08 10:21:42,167 INFO __main__ Wrote flow state to /app/data/output/offer_ingestion_state.json
+{
+  "api_url": null,
+  "xml_input_path": null,
+  "run_fetch_script": false,
+  "output_dir": "/app/data/output",
+  "standalone_records_path": "/app/data/output/updated_offers.json",
+  "offer_es_docs_path": "/app/data/output/offer_es_docs.jsonl",
+  "embeddings_output_path": "/app/data/output/embedding_vectors.jsonl",
+  "config_path": "/app/offerIngestion/offer_config.json",
+  "model_name": "all-MiniLM-L6-v2",
+  "batch_size": 32,
+  "chunk_size": 1200,
+  "chunk_overlap": 200,
+  "recreate_index": true,
+  "settings_overrides": {
+    "elasticsearch_url": "http://elasticsearch:9200",
+    "elasticsearch_username": null,
+    "elasticsearch_password": null,
+    "db_url": null,
+    "index_name": "kb_documents_offers"
+  },
+  "enable_llm_enrichment": false,
+  "max_llm_offers": null,
+  "run_started_epoch_ms": 1783506094700,
+  "is_initial_run": true,
+  "stage": "finalize",
+  "error": null,
+  "timings": {
+    "load_updated_offers_seconds": 0.036,
+    "embedding_seconds": 5.908,
+    "remove_stale_seconds": 0.001,
+    "index_seconds": 1.502
+  },
+  "total_offers": 116,
+  "offers_parsed": 116,
+  "changed_normalized_urls": [],
+  "deleted_doc_ids": [],
+  "payload_count": 116,
+  "payload_delta_count": 116,
+  "embeddings_count": 116,
+  "indexed_count": 116,
+  "deleted_count": 0,
+  "indexing_errors": 0,
+  "has_changes": true,
+  "stop_reason": null,
+  "skip_fetch": true,
+  "index_from_updated_offers": true,
+  "updated_offers_path": "/app/data/output/updated_offers.json"
+}

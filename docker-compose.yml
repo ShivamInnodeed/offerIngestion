@@ -1,0 +1,73 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.1
+    container_name: offer-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.2.1
+    container_name: offer-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      SERVER_PUBLICBASEURL: http://localhost:5601
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  offer-ingestion-api:
+    build:
+      context: ..
+      dockerfile: offerIngestion/Dockerfile
+    image: offer-ingestion-api:latest
+    container_name: offer-ingestion-api
+    environment:
+      SCHEDULER_API_KEY: ${SCHEDULER_API_KEY:-test123}
+      DEFAULT_ES_URL: http://elasticsearch:9200
+      ES_ELASTICSEARCH_URL: http://elasticsearch:9200
+      INGESTION_DIR: /app/ingestion
+      OFFER_CONFIG_PATH: /app/offerIngestion/offer_config.json
+      OFFER_OUTPUT_DIR: /app/data/output
+      OFFER_LOG_DIR: /app/data/logs
+      OFFER_XML_PATH: /app/offerIngestion/all_xml_data/all_offer_data1.xml
+      PYTHONPATH: /app/offerIngestion:/app/ingestion
+      LLM_API_URL: ${LLM_API_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_TIMEOUT: ${LLM_TIMEOUT:-}
+      LLM_TEMPERATURE: ${LLM_TEMPERATURE:-}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-3}
+      LLM_RETRY_DELAY_SECONDS: ${LLM_RETRY_DELAY_SECONDS:-2}
+      LLM_BEARER_TOKEN: ${LLM_BEARER_TOKEN:-}
+      LLM_AUTH_HEADER: ${LLM_AUTH_HEADER:-}
+      LLM_AUTH_VALUE: ${LLM_AUTH_VALUE:-}
+    volumes:
+      - ./offer_config.json:/app/offerIngestion/offer_config.json:ro
+      - ./all_xml_data:/app/offerIngestion/all_xml_data
+      - ./output:/app/data/output
+      - offer-data:/app/data/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  es-data:
+  offer-data:
