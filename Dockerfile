@@ -41,6 +41,7 @@ COPY offerIngestion/offer_es_mapping.py     /app/offerIngestion/
 COPY offerIngestion/offer_standalone_index.py /app/offerIngestion/
 COPY offerIngestion/offer_config.json       /app/offerIngestion/
 COPY offerIngestion/script.py               /app/offerIngestion/
+COPY offerIngestion/bootstrap_oracle_schema.py /app/offerIngestion/
 COPY offerIngestion/api/                    /app/offerIngestion/api/
 COPY offerIngestion/common/                 /app/offerIngestion/common/
 

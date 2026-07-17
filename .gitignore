@@ -4,3 +4,9 @@ venv/
 .venv/
 .idea/
 .vscode/
+.env
+*.db
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+local/

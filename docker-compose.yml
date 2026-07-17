@@ -41,6 +41,8 @@ services:
       SCHEDULER_API_KEY: ${SCHEDULER_API_KEY:-test123}
       DEFAULT_ES_URL: http://elasticsearch:9200
       ES_ELASTICSEARCH_URL: http://elasticsearch:9200
+      # Set in .env — do not commit credentials. Encode # as %23 in passwords.
+      ES_DB_URL: ${ES_DB_URL:-}
       INGESTION_DIR: /app/ingestion
       OFFER_CONFIG_PATH: /app/offerIngestion/offer_config.json
       OFFER_OUTPUT_DIR: /app/data/output
