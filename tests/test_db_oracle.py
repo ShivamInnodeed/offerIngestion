@@ -66,20 +66,18 @@ def test_timestamp_round_trip_text() -> None:
     assert parsed == dt
 
 
-def test_sqlite_session_factory_does_not_create_schema_by_default(tmp_path: Path) -> None:
+def test_sqlite_session_factory_creates_schema_by_default(tmp_path: Path) -> None:
     db_path = tmp_path / "test.db"
     settings = AppSettings(db_url=f"sqlite:///{db_path}")
-    factory = build_session_factory(settings, create_schema=False)
+    factory = build_session_factory(settings)
     engine = factory.kw["bind"]
     assert engine.dialect.name == "sqlite"
-    # Tables should not exist yet
     with engine.connect() as conn:
         rows = conn.exec_driver_sql(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='website_crawl_run'"
         ).fetchall()
-    assert rows == []
+    assert rows
 
-    init_db(engine)
     session = factory()
     try:
         run = CrawlRunRepository(session).create_run(
