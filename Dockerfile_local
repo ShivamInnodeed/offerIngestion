@@ -1,6 +1,19 @@
-FROM 172.16.26.144/base/genie-ingestion-base:1.0
+# Build context must be the parent directory (d:\test\ingestion\)
+# Build with: docker build -f offerIngestion/Dockerfile -t offer-ingestion-api .
+
+FROM python:3.11-slim-bookworm
+
+RUN set -eux; \
+    apt-get update -o Acquire::Retries=5; \
+    apt-get install -y --no-install-recommends build-essential; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Install Python dependencies
+COPY offerIngestion/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --default-timeout=1200 --retries 20 -r /tmp/requirements.txt
 
 # Optional offline wheels (for air-gapped servers). Safe to keep empty.
 COPY offerIngestion/wheels/ /tmp/wheels/
@@ -36,6 +49,9 @@ COPY offerIngestion/common/                 /app/offerIngestion/common/
 COPY offerIngestion/all_xml_data/           /app/offerIngestion/all_xml_data/
 
 ENV PYTHONPATH=/app/offerIngestion:/app/ingestion
+
+# Pre-download embedding model into the image so the server does not need HuggingFace access.
+RUN python -c "from sentence_transformers import SentenceTransformer; m=SentenceTransformer('all-MiniLM-L6-v2'); m.save('/app/models/all-MiniLM-L6-v2')"
 
 # Persistent directories
 RUN mkdir -p /app/data/output /app/data/logs
